@@ -1,0 +1,168 @@
+<script lang="ts">
+	import { resolve } from '$app/paths';
+	import { fly } from 'svelte/transition';
+	import { cn } from '$lib/chrome/shared/cn';
+	import {
+		isNavItemActive,
+		type NavRouteItem,
+		type NavSection,
+		type NavSectionId
+	} from '$lib/chrome/shared/nav';
+
+	type Props = {
+		sections: readonly NavSection[];
+		currentPathname: string;
+		expanded: boolean;
+		renderMode?: 'desktop' | 'mobile';
+		onHoverRoute?: (route: NavRouteItem | null, sectionId: NavSectionId) => void;
+		onSelectRoute?: (route: NavRouteItem) => void;
+	};
+
+	let {
+		sections,
+		currentPathname,
+		expanded,
+		renderMode = 'desktop',
+		onHoverRoute,
+		onSelectRoute
+	}: Props = $props();
+
+	function isBottomSection(sectionId: NavSectionId) {
+		return sectionId === 'bottom';
+	}
+
+	function shouldShowCollapsedDivider(sectionIndex: number) {
+		if (renderMode !== 'desktop' || expanded) return false;
+
+		const section = sections[sectionIndex];
+		const previousSection = sections[sectionIndex - 1];
+
+		return Boolean(section?.showCollapsedDivider && previousSection?.items.length && section.items.length);
+	}
+
+	function getContainerClassName(sectionId: NavSectionId) {
+		return cn(
+			'relative',
+			expanded ? 'block w-full' : 'inline-flex',
+			renderMode === 'desktop' && isBottomSection(sectionId) && !expanded && 'self-center'
+		);
+	}
+
+	function getItemClassName(params: {
+		sectionId: NavSectionId;
+		isActive: boolean;
+		disabled?: boolean;
+	}) {
+		const { sectionId, isActive, disabled = false } = params;
+		const isBottom = isBottomSection(sectionId);
+
+		if (renderMode === 'mobile') {
+			return cn(
+				'inline-flex h-10 w-full items-center justify-start gap-2.5 rounded-md px-2 text-xs tracking-wide text-zinc-600 transition-colors hover:bg-zinc-100/70 hover:text-zinc-900',
+				disabled && 'pointer-events-none opacity-40',
+				isActive && 'bg-zinc-100/70 text-zinc-900'
+			);
+		}
+
+		return cn(
+			'inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm tracking-wide transition-colors',
+			expanded
+				? 'h-7 w-full justify-start gap-2.5 rounded-sm border border-transparent px-2 text-xs text-zinc-600 hover:bg-transparent hover:text-zinc-800'
+				: isBottom
+					? 'size-7 justify-center rounded-full border border-zinc-100 bg-white text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
+					: 'size-7 justify-center rounded-sm border border-transparent text-zinc-500 hover:bg-transparent hover:text-zinc-800',
+			disabled && 'pointer-events-none opacity-50',
+			isActive &&
+				(expanded
+					? 'text-zinc-900'
+					: isBottom
+						? 'border-zinc-300 bg-white text-zinc-900'
+						: 'text-zinc-900')
+		);
+	}
+</script>
+
+{#each sections as section, sectionIndex (section.id)}
+	<div
+		class={cn(
+			'flex flex-col',
+			(renderMode === 'mobile' || expanded || section.id === 'bottom') &&
+				(renderMode === 'mobile' ? section.mobileSectionClass : section.desktopSectionClass),
+			section.id === 'bottom' && (renderMode === 'mobile' ? 'mt-auto' : 'mt-auto pb-1')
+		)}
+	>
+		{#if section.heading && (renderMode === 'mobile' || expanded)}
+			<div class={renderMode === 'mobile' ? '' : 'mb-2'} in:fly={{ x: -4, duration: 200 }}>
+				<p
+					class={renderMode === 'mobile'
+						? 'px-2 pb-2 text-[11px] uppercase tracking-wide text-zinc-400'
+						: 'px-2 text-[11px] uppercase tracking-wide text-zinc-400'}
+				>
+					{section.heading}
+				</p>
+			</div>
+		{:else if shouldShowCollapsedDivider(sectionIndex)}
+			<div class="py-3">
+				<span aria-hidden="true" class="mx-auto block h-px w-4 bg-zinc-200/50"></span>
+			</div>
+		{/if}
+
+		<ul class="flex flex-col gap-1.5">
+			{#each section.items as item (item.kind === 'route' ? item.id : `${section.id}:${item.label}`)}
+				<li>
+					<span class={getContainerClassName(section.id)}>
+						{#if item.kind === 'disabled'}
+							{@const Icon = item.icon}
+							<span class={getItemClassName({ sectionId: section.id, isActive: false, disabled: true })}>
+								<Icon class="size-3.5 shrink-0" />
+								{#if renderMode === 'mobile' || expanded}
+									<span class={renderMode === 'mobile' ? 'min-w-0 truncate' : 'min-w-0 overflow-hidden'}>
+										{#if renderMode === 'mobile'}
+											{item.label}
+										{:else}
+											<span class="block truncate text-left">{item.label}</span>
+										{/if}
+									</span>
+								{:else}
+									<span class="sr-only">{item.label}</span>
+								{/if}
+							</span>
+						{:else}
+							{@const Icon = item.icon}
+							<a
+								href={resolve(item.href)}
+								data-sidebar-indicator-key={renderMode === 'desktop' ? item.id : undefined}
+								class={getItemClassName({
+									sectionId: section.id,
+									isActive: isNavItemActive(item.href, currentPathname)
+								})}
+								onmouseenter={() => {
+									onHoverRoute?.(item, section.id);
+								}}
+								onclick={() => {
+									onSelectRoute?.(item);
+								}}
+							>
+								<Icon class="size-3.5 shrink-0" />
+								{#if renderMode === 'mobile' || expanded}
+									<span
+										class={renderMode === 'mobile' ? 'min-w-0 truncate' : 'min-w-0 overflow-hidden'}
+										in:fly={renderMode === 'mobile' ? undefined : { x: -4, duration: 200 }}
+									>
+										{#if renderMode === 'mobile'}
+											{item.label}
+										{:else}
+											<span class="block truncate text-left">{item.label}</span>
+										{/if}
+									</span>
+								{:else}
+									<span class="sr-only">{item.label}</span>
+								{/if}
+							</a>
+						{/if}
+					</span>
+				</li>
+			{/each}
+		</ul>
+	</div>
+{/each}
