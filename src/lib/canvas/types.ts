@@ -15,5 +15,6 @@ export type PromptCanvasTrainer = {
 export type PromptCanvasContent = {
 	heading: string;
 	initialValue: string;
+	placeholder?: string;
 	actions: readonly PromptCanvasAction[];
 };

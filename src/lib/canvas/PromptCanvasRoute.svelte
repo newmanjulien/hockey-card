@@ -21,6 +21,7 @@
 <PromptCanvas
 	heading={route.prompt.heading}
 	value={route.prompt.initialValue}
+	placeholder={route.prompt.placeholder}
 	actions={route.prompt.actions}
 	trainer={route.trainer}
 	onAttach={handleAttach}

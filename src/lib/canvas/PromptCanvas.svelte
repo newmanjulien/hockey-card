@@ -18,6 +18,7 @@
 		heading: string;
 		actions: readonly PromptCanvasAction[];
 		value?: string;
+		placeholder?: string;
 		trainer?: PromptCanvasTrainer;
 		onAttach?: () => void;
 		onSubmit?: (value: string) => void;
@@ -27,6 +28,7 @@
 		heading,
 		actions,
 		value = $bindable(''),
+		placeholder = 'Ask a question...',
 		trainer,
 		onAttach,
 		onSubmit
@@ -36,7 +38,6 @@
 	let selectedActionId = $state<PromptCanvasActionId | null>(null);
 
 	const canSubmit = $derived(Boolean(onSubmit) && value.trim().length > 0);
-	const placeholder = 'Ask a question...';
 	const selectedAction = $derived(
 		actions.find((action) => action.id === selectedActionId) ?? null
 	);

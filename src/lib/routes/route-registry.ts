@@ -24,6 +24,7 @@ export type AppRouteDefinition = {
 };
 
 const DEFAULT_PROMPT_HEADING = 'What question can I help with?';
+const DEFAULT_PROMPT_PLACEHOLDER = 'Ask a question...';
 const DEFAULT_PROMPT_ACTIONS = [
 	{
 		id: 'image',
@@ -47,10 +48,16 @@ const DEFAULT_PROMPT_ACTIONS = [
 	}
 ] as const satisfies readonly PromptCanvasAction[];
 
-function createPrompt(initialValue: string): PromptCanvasContent {
+function createPrompt(
+	initialValue: string,
+	options?: {
+		placeholder?: string;
+	}
+): PromptCanvasContent {
 	return {
 		heading: DEFAULT_PROMPT_HEADING,
 		initialValue,
+		placeholder: options?.placeholder ?? DEFAULT_PROMPT_PLACEHOLDER,
 		actions: DEFAULT_PROMPT_ACTIONS
 	};
 }
@@ -85,7 +92,10 @@ export const ROUTE_REGISTRY = {
 		title: 'Trade credit for Veolia',
 		icon: HandCoins,
 		prompt: createPrompt(
-			'How does trade credit insurance work? How does it work in this specific industry? And why would Veolia need it?'
+			'How does trade credit insurance work? How does it work in this specific industry? And why would Veolia need it?',
+			{
+				placeholder: 'Dig into trade credit insurance or ask about Veolia specifically'
+			}
 		),
 		trainer: {
 			name: 'Adam Bunz',
@@ -100,7 +110,10 @@ export const ROUTE_REGISTRY = {
 		title: 'Cyber for Cirque du Soleil',
 		icon: Shield,
 		prompt: createPrompt(
-			'How does cyber insurance work? How does it work in this specific industry? And why would Cirque du Soleil need it?'
+			'How does cyber insurance work? How does it work in this specific industry? And why would Cirque du Soleil need it?',
+			{
+				placeholder: 'Dig into cyber insurance or ask about Cirque du Soleil specifically'
+			}
 		),
 		trainer: {
 			name: 'Aaron Weinstock',
@@ -115,7 +128,11 @@ export const ROUTE_REGISTRY = {
 		title: 'Global services for Cirque du Soleil',
 		icon: Globe,
 		prompt: createPrompt(
-			'How does international business insurance work? How does it work in this specific industry? And why would Cirque du Soleil need it?'
+			'How does international business insurance work? How does it work in this specific industry? And why would Cirque du Soleil need it?',
+			{
+				placeholder:
+					'Dig into international business insurance or ask about Cirque du Soleil specifically'
+			}
 		),
 		trainer: {
 			name: 'Andrew Torr',
@@ -130,7 +147,10 @@ export const ROUTE_REGISTRY = {
 		title: 'Environmental risk for Exterra',
 		icon: Leaf,
 		prompt: createPrompt(
-			'How does environmental risk insurance work? How does it work in this specific industry? And why would Exterra need it?'
+			'How does environmental risk insurance work? How does it work in this specific industry? And why would Exterra need it?',
+			{
+				placeholder: 'Dig into environmental risk insurance or ask about Exterra specifically'
+			}
 		),
 		trainer: {
 			name: 'Leanne Thompson',
@@ -145,7 +165,10 @@ export const ROUTE_REGISTRY = {
 		title: 'Surety for Exterra',
 		icon: BadgeDollarSign,
 		prompt: createPrompt(
-			'How do surety bonds work? How does it work in this specific industry? And why would Exterra need them?'
+			'How do surety bonds work? How does it work in this specific industry? And why would Exterra need them?',
+			{
+				placeholder: 'Dig into surety bonds or ask about Exterra specifically'
+			}
 		),
 		trainer: {
 			name: 'Brad Cox',
