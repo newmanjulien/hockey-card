@@ -21,23 +21,24 @@ export type NavRouteItem = {
 };
 
 export type NavDisabledItem = {
+	id: string;
 	kind: 'disabled';
 	label: string;
 	icon: NavIcon;
 };
 
-export type NavItem = NavRouteItem | NavDisabledItem;
+export type NavFooterItem = NavDisabledItem;
 
 export type NavSection = {
 	id: NavSectionId;
-	heading: string | null;
+	heading: string;
 	desktopSectionClass?: string;
 	mobileSectionClass?: string;
 	showCollapsedDivider?: boolean;
-	items: readonly NavItem[];
+	items: readonly NavRouteItem[];
 };
 
-const ROUTE_ITEMS: NavRouteItem[] = (
+export const NAV_ROUTE_ITEMS: readonly NavRouteItem[] = (
 	Object.entries(ROUTE_REGISTRY) as [NavRouteId, AppRouteDefinition][]
 ).map(([id, route]) => ({
 	kind: 'route' as const,
@@ -51,20 +52,16 @@ const ROUTE_ITEMS: NavRouteItem[] = (
 export const NAV_SECTIONS: readonly NavSection[] = [
 	...ROUTE_SECTION_DEFINITIONS.map((section) => ({
 		...section,
-		items: ROUTE_ITEMS.filter((item) => ROUTE_REGISTRY[item.id].sectionId === section.id)
-	})),
+		items: NAV_ROUTE_ITEMS.filter((item) => ROUTE_REGISTRY[item.id].sectionId === section.id)
+	}))
+] as const;
+
+export const NAV_FOOTER_ITEMS: readonly NavFooterItem[] = [
 	{
-		id: 'bottom',
-		heading: null,
-		desktopSectionClass: 'pt-3',
-		mobileSectionClass: 'pt-6',
-		items: [
-			{
-				kind: 'disabled',
-				label: 'Contact support',
-				icon: CircleQuestionMark
-			}
-		]
+		id: 'contact-support',
+		kind: 'disabled',
+		label: 'Contact support',
+		icon: CircleQuestionMark
 	}
 ] as const;
 
@@ -75,17 +72,9 @@ export function isNavItemActive(href: string, pathname: string) {
 }
 
 export function getActiveNavRoute(pathname: string) {
-	for (const section of NAV_SECTIONS) {
-		for (const item of section.items) {
-			if (item.kind === 'route' && isNavItemActive(item.href, pathname)) {
-				return item;
-			}
-		}
-	}
-
 	return (
-		NAV_SECTIONS.flatMap((section) => section.items).find(
-			(item): item is NavRouteItem => item.kind === 'route' && item.id === DEFAULT_ROUTE_ID
-		) ?? null
+		NAV_ROUTE_ITEMS.find((item) => isNavItemActive(item.href, pathname)) ??
+		NAV_ROUTE_ITEMS.find((item) => item.id === DEFAULT_ROUTE_ID) ??
+		null
 	);
 }

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { ChevronsUpDown } from 'lucide-svelte';
+	import DesktopNavList from '$lib/chrome/desktop/DesktopNavList.svelte';
 	import { DEFAULT_BROKER } from '$lib/chrome/shared/branding';
 	import { cn } from '$lib/chrome/shared/cn';
 	import HomeLink from '$lib/chrome/shared/HomeLink.svelte';
-	import NavList from '$lib/chrome/shared/NavList.svelte';
 	import PersonAvatar from '$lib/chrome/shared/PersonAvatar.svelte';
 	import {
 		getActiveNavRoute,
+		NAV_FOOTER_ITEMS,
 		NAV_SECTIONS,
 		type NavRouteItem
 	} from '$lib/chrome/shared/nav';
@@ -24,20 +25,12 @@
 	const activeRoute = $derived(getActiveNavRoute(currentPathname));
 	let hoveredRoute = $state<NavRouteItem | null>(null);
 
-	const bottomRouteIds = new Set(
-		NAV_SECTIONS.flatMap((section) =>
-			section.id === 'bottom'
-				? section.items.flatMap((item) => (item.kind === 'route' ? [item.id] : []))
-				: []
-		)
-	);
-
 	const indicatorTarget = $derived.by(() => {
 		const targetRoute = hoveredRoute ?? activeRoute;
 
 		return {
 			targetKey: targetRoute?.id ?? null,
-			enabled: Boolean(targetRoute && !bottomRouteIds.has(targetRoute.id))
+			enabled: Boolean(targetRoute)
 		};
 	});
 </script>
@@ -80,13 +73,13 @@
 			aria-hidden="true"
 			class="sidebar-nav-indicator pointer-events-none absolute rounded-sm bg-zinc-200/60 transition-[top,left,width,height,opacity] duration-200 ease-out"
 		></span>
-		<NavList
+		<DesktopNavList
 			sections={NAV_SECTIONS}
+			footerItems={NAV_FOOTER_ITEMS}
 			{currentPathname}
 			expanded={shellState.isSidebarExpanded}
-			renderMode="desktop"
-			onHoverRoute={(route, sectionId) => {
-				hoveredRoute = sectionId === 'bottom' ? null : route;
+			onRouteHover={(route) => {
+				hoveredRoute = route;
 			}}
 		/>
 	</nav>

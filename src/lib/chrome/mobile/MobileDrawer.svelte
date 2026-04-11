@@ -1,8 +1,8 @@
 <script lang="ts">
+	import MobileNavList from '$lib/chrome/mobile/MobileNavList.svelte';
 	import { X } from 'lucide-svelte';
 	import HomeLink from '$lib/chrome/shared/HomeLink.svelte';
-	import NavList from '$lib/chrome/shared/NavList.svelte';
-	import { NAV_SECTIONS } from '$lib/chrome/shared/nav';
+	import { NAV_FOOTER_ITEMS, NAV_SECTIONS } from '$lib/chrome/shared/nav';
 	import { useChromeShellState } from '$lib/chrome/shared/shell.svelte';
 
 	type Props = {
@@ -35,13 +35,12 @@
 			</header>
 
 			<div class="flex-1 overflow-y-auto px-(--shell-gutter-mobile) py-4">
-				<nav aria-label="Dashboard navigation" class="relative mt-2 flex min-h-full flex-col">
-					<NavList
+				<nav aria-label="Dashboard navigation" class="relative mt-2 min-h-full">
+					<MobileNavList
 						sections={NAV_SECTIONS}
+						footerItems={NAV_FOOTER_ITEMS}
 						{currentPathname}
-						expanded={true}
-						renderMode="mobile"
-						onSelectRoute={() => {
+						onRouteSelect={() => {
 							shellState.isMobileDrawerOpen = false;
 						}}
 					/>

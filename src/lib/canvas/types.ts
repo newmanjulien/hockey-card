@@ -12,9 +12,20 @@ export type PromptCanvasTrainer = {
 	avatar: string;
 };
 
+export type PromptCanvasRailMessage = {
+	body: string;
+	dismissalKey: string;
+};
+
 export type PromptCanvasContent = {
 	heading: string;
 	initialValue: string;
 	placeholder?: string;
 	actions: readonly PromptCanvasAction[];
+	railMessage?: PromptCanvasRailMessage;
+};
+
+export type PromptCanvasRouteContent = {
+	prompt: PromptCanvasContent;
+	trainer: PromptCanvasTrainer;
 };

@@ -4,6 +4,7 @@
 	import type {
 		PromptCanvasAction,
 		PromptCanvasActionId,
+		PromptCanvasRailMessage,
 		PromptCanvasTrainer
 	} from '$lib/canvas/types';
 	import PersonAvatar from '$lib/chrome/shared/PersonAvatar.svelte';
@@ -20,6 +21,8 @@
 		value?: string;
 		placeholder?: string;
 		trainer?: PromptCanvasTrainer;
+		railMessage?: PromptCanvasRailMessage;
+		showRailMessage?: boolean;
 		onAttach?: () => void;
 		onSubmit?: (value: string) => void;
 	};
@@ -30,12 +33,15 @@
 		value = $bindable(''),
 		placeholder = 'Ask a question...',
 		trainer,
+		railMessage,
+		showRailMessage = true,
 		onAttach,
 		onSubmit
 	}: Props = $props();
 	let canvasElement = $state<HTMLDivElement | null>(null);
 	let textareaElement = $state<HTMLTextAreaElement | null>(null);
 	let selectedActionId = $state<PromptCanvasActionId | null>(null);
+	const MAX_TEXTAREA_LINES = 11;
 
 	const canSubmit = $derived(Boolean(onSubmit) && value.trim().length > 0);
 	const selectedAction = $derived(
@@ -47,8 +53,25 @@
 			return;
 		}
 
+		const computedStyle = window.getComputedStyle(textareaElement);
+		const lineHeight = Number.parseFloat(computedStyle.lineHeight);
+		const paddingHeight =
+			Number.parseFloat(computedStyle.paddingTop) +
+			Number.parseFloat(computedStyle.paddingBottom) +
+			Number.parseFloat(computedStyle.borderTopWidth) +
+			Number.parseFloat(computedStyle.borderBottomWidth);
+		const maxHeight = Number.isFinite(lineHeight)
+			? lineHeight * MAX_TEXTAREA_LINES + paddingHeight
+			: null;
+
 		textareaElement.style.height = '0px';
-		textareaElement.style.height = `${textareaElement.scrollHeight}px`;
+		const nextHeight =
+			maxHeight === null
+				? textareaElement.scrollHeight
+				: Math.min(textareaElement.scrollHeight, maxHeight);
+		textareaElement.style.height = `${nextHeight}px`;
+		textareaElement.style.overflowY =
+			maxHeight !== null && textareaElement.scrollHeight > maxHeight ? 'auto' : 'hidden';
 	}
 
 	function handleSubmit() {
@@ -76,6 +99,12 @@
 		textareaElement?.focus();
 		textareaElement?.setSelectionRange(suggestion.length, suggestion.length);
 	}
+
+	$effect(() => {
+		textareaElement;
+		value;
+		syncTextareaHeight();
+	});
 
 	onMount(() => {
 		function handlePointerDown(event: PointerEvent) {
@@ -127,8 +156,7 @@
 							rows={1}
 							aria-label="Prompt input"
 							placeholder={placeholder}
-							class="prompt-input min-h-[2.4rem] w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-[0.84rem] leading-[1.38] text-zinc-800 outline-none placeholder:font-normal placeholder:text-zinc-400 md:min-h-[2.6rem] md:text-[0.9rem]"
-							oninput={syncTextareaHeight}
+							class="prompt-input w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-[0.84rem] leading-[1.38] text-zinc-800 outline-none placeholder:font-normal placeholder:text-zinc-400 md:text-[0.9rem]"
 						></textarea>
 					</div>
 
@@ -257,10 +285,18 @@
 							</button>
 						</section>
 					{/if}
+
+						{#if railMessage && showRailMessage}
+							<section class="px-4 py-4">
+								<p class="text-[12px] leading-relaxed text-zinc-600">
+									{railMessage.body}
+								</p>
+							</section>
+						{/if}
+				</div>
 			</div>
-		</div>
-	</aside>
-</div>
+		</aside>
+	</div>
 
 <style>
 	.prompt-canvas-layout {
