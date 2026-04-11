@@ -16,7 +16,7 @@
 	let { children }: LayoutProps = $props();
 
 	const shellState = $state<ChromeShellState>({
-		isSidebarExpanded: false,
+		isSidebarExpanded: true,
 		isMobileDrawerOpen: false
 	});
 

@@ -90,7 +90,7 @@ export const ROUTE_REGISTRY = {
 		trainer: {
 			name: 'Adam Bunz',
 			title: 'Affinity Groups Leader-Western Region',
-			avatar: '/bunz.webp'
+			avatar: '/avatars/bunz.webp'
 		}
 	},
 	'cirque-cyber': {
@@ -105,7 +105,7 @@ export const ROUTE_REGISTRY = {
 		trainer: {
 			name: 'Aaron Weinstock',
 			title: 'National Practice Leader-Environmental Risk',
-			avatar: '/weinstock.webp'
+			avatar: '/avatars/weinstock.webp'
 		}
 	},
 	'cirque-global-services': {
@@ -120,7 +120,7 @@ export const ROUTE_REGISTRY = {
 		trainer: {
 			name: 'Andrew Torr',
 			title: 'Senior Vice-President - Risk Management',
-			avatar: '/torr.webp'
+			avatar: '/avatars/torr.webp'
 		}
 	},
 	'exterra-environmental-risk': {
@@ -135,7 +135,7 @@ export const ROUTE_REGISTRY = {
 		trainer: {
 			name: 'Leanne Thompson',
 			title: 'Senior Vice-President, Real Estate Leader',
-			avatar: '/thompson.webp'
+			avatar: '/avatars/thompson.webp'
 		}
 	},
 	'exterra-surety': {
@@ -150,7 +150,7 @@ export const ROUTE_REGISTRY = {
 		trainer: {
 			name: 'Brad Cox',
 			title: 'National Practice Leader, Transportation',
-			avatar: '/cox.webp'
+			avatar: '/avatars/cox.webp'
 		}
 	}
 } as const satisfies Record<string, AppRouteDefinition>;

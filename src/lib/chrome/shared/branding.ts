@@ -7,5 +7,5 @@ export const BRANDING = {
 
 export const DEFAULT_BROKER = {
 	name: 'Broker',
-	avatar: '/morin.webp'
+	avatar: '/avatars/morin.webp'
 } as const;
