@@ -25,6 +25,7 @@
 	actions={content.prompt.actions}
 	trainer={content.trainer}
 	documents={content.documents}
+	documentsNote={content.documentsNote}
 	onAttach={handleAttach}
 	onSubmit={handleSubmit}
 />

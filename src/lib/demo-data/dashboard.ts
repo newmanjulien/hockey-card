@@ -99,10 +99,10 @@ export const DEMO_ROUTES = {
 		clientId: 'cirque',
 		iconId: 'shield',
 		expert: {
-			firstName: 'Aaron',
-			lastName: 'Weinstock',
-			title: 'National Practice Leader-Environmental Risk',
-			avatar: '/avatars/weinstock.webp'
+			firstName: 'Brad',
+			lastName: 'Cox',
+			title: 'National Practice Leader, Transportation',
+			avatar: '/avatars/cox.webp'
 		},
 		insurance: {
 			name: 'cyber',
@@ -149,10 +149,10 @@ export const DEMO_ROUTES = {
 		clientId: 'exterra',
 		iconId: 'leaf',
 		expert: {
-			firstName: 'Leanne',
-			lastName: 'Thompson',
-			title: 'Senior Vice-President, Real Estate Leader',
-			avatar: '/avatars/thompson.webp'
+			firstName: 'Aaron',
+			lastName: 'Weinstock',
+			title: 'National Practice Leader-Environmental Risk',
+			avatar: '/avatars/weinstock.webp'
 		},
 		insurance: {
 			name: 'environmental risk',
@@ -174,10 +174,10 @@ export const DEMO_ROUTES = {
 		clientId: 'exterra',
 		iconId: 'badge-dollar-sign',
 		expert: {
-			firstName: 'Brad',
-			lastName: 'Cox',
-			title: 'National Practice Leader, Transportation',
-			avatar: '/avatars/cox.webp'
+			firstName: 'Leanne',
+			lastName: 'Thompson',
+			title: 'Senior Vice-President, Real Estate Leader',
+			avatar: '/avatars/thompson.webp'
 		},
 		insurance: {
 			name: 'surety',

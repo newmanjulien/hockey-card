@@ -21,11 +21,12 @@
 		value?: string;
 		trainer: PromptCanvasTrainer;
 		documents?: readonly PromptCanvasDocument[];
+		documentsNote: string;
 		onAttach?: () => void;
 		onSubmit?: (value: string) => void;
 	};
 
-	const DEFAULT_PROMPT_PLACEHOLDER = 'Ask a question about the docs...';
+	const DEFAULT_PROMPT_PLACEHOLDER = 'Ask about the docs...';
 
 	let {
 		heading,
@@ -33,6 +34,7 @@
 		value = $bindable(''),
 		trainer,
 		documents = [],
+		documentsNote,
 		onAttach,
 		onSubmit
 	}: Props = $props();
@@ -254,7 +256,7 @@
 		</div>
 	</section>
 
-		<PromptCanvasRail {trainer} {documents} />
+		<PromptCanvasRail {trainer} {documents} {documentsNote} />
 	</div>
 
 <style>

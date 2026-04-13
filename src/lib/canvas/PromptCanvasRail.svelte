@@ -6,9 +6,10 @@
 	type Props = {
 		trainer: PromptCanvasTrainer;
 		documents?: readonly PromptCanvasDocument[];
+		documentsNote: string;
 	};
 
-	let { trainer, documents = [] }: Props = $props();
+	let { trainer, documents = [], documentsNote }: Props = $props();
 </script>
 
 <aside class="prompt-canvas-rail-shell hidden w-full lg:block lg:border-l lg:border-zinc-100">
@@ -40,6 +41,10 @@
 			</section>
 
 			<PromptCanvasDocumentSection {documents} />
+
+			<section class="border-t border-zinc-100 px-4 py-4">
+				<p class="text-[12px] leading-relaxed text-zinc-600">{documentsNote}</p>
+			</section>
 		</div>
 	</div>
 </aside>

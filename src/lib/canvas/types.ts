@@ -28,4 +28,5 @@ export type PromptCanvasRouteContent = {
 	prompt: PromptCanvasContent;
 	trainer: PromptCanvasTrainer;
 	documents: readonly PromptCanvasDocument[];
+	documentsNote: string;
 };
