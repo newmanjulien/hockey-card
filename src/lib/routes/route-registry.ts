@@ -20,7 +20,7 @@ import {
 	getRouteNavLabel,
 	getRouteSectionHeading,
 	getRouteTitle
-} from '$lib/routes/route-content';
+} from '$lib/routes/route-metadata';
 
 type NavIcon = typeof CircleQuestionMark;
 
