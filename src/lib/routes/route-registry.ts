@@ -6,10 +6,27 @@ import {
 	Leaf,
 	Shield
 } from 'lucide-svelte';
+import {
+	CLIENT_IDS,
+	DEFAULT_DEMO_ROUTE_ID,
+	ROUTE_IDS,
+	DEMO_CLIENTS,
+	getDemoRoute,
+	type DemoClientId,
+	type DemoRouteIconId,
+	type DemoRouteId
+} from '$lib/demo-data/dashboard';
+import {
+	getRouteNavLabel,
+	getRouteSectionHeading,
+	getRouteTitle
+} from '$lib/routes/route-content';
 
 type NavIcon = typeof CircleQuestionMark;
 
-export type NavSectionId = 'next-30-days' | 'next-90-days' | 'history';
+export type NavSectionId = DemoClientId;
+export type NavRouteId = DemoRouteId;
+export type NavPath = `/${NavRouteId}`;
 
 type RouteSectionDefinition = {
 	id: NavSectionId;
@@ -20,77 +37,62 @@ type RouteSectionDefinition = {
 };
 
 export type AppRouteDefinition = {
-	sectionId: RouteSectionDefinition['id'];
-	href: `/${string}`;
+	sectionId: NavSectionId;
+	href: NavPath;
 	navLabel: string;
 	title: string;
 	icon: NavIcon;
 };
 
-export const ROUTE_SECTION_DEFINITIONS: readonly RouteSectionDefinition[] = [
-	{
-		id: 'next-30-days',
-		heading: 'Veolia',
-		desktopSectionClass: 'pt-2'
-	},
-	{
-		id: 'next-90-days',
-		heading: 'Cirque du Soleil',
-		desktopSectionClass: 'pt-6',
-		mobileSectionClass: 'pt-4',
-		showCollapsedDivider: true
-	},
-	{
-		id: 'history',
-		heading: 'Exterra',
-		desktopSectionClass: 'pt-6',
-		mobileSectionClass: 'pt-4',
-		showCollapsedDivider: true
+const ROUTE_ICON_MAP = {
+	'badge-dollar-sign': BadgeDollarSign,
+	globe: Globe,
+	'hand-coins': HandCoins,
+	leaf: Leaf,
+	shield: Shield
+} as const satisfies Record<DemoRouteIconId, NavIcon>;
+
+function createRouteDefinition(routeId: NavRouteId): AppRouteDefinition {
+	const route = getDemoRoute(routeId);
+
+	return {
+		sectionId: route.clientId,
+		href: `/${routeId}`,
+		navLabel: getRouteNavLabel(route),
+		title: getRouteTitle(route),
+		icon: ROUTE_ICON_MAP[route.iconId]
+	};
+}
+
+function getFirstRouteForClient(clientId: NavSectionId) {
+	const routeId = ROUTE_IDS.find((candidateId) => getDemoRoute(candidateId).clientId === clientId);
+
+	if (!routeId) {
+		throw new Error(`No route found for client "${clientId}"`);
 	}
-] as const;
+
+	return getDemoRoute(routeId);
+}
+
+export const ROUTE_SECTION_DEFINITIONS: readonly RouteSectionDefinition[] = CLIENT_IDS.map(
+	(clientId, index) => ({
+		id: clientId,
+		heading: getRouteSectionHeading(getFirstRouteForClient(clientId)),
+		desktopSectionClass: index === 0 ? 'pt-2' : 'pt-6',
+		mobileSectionClass: index === 0 ? undefined : 'pt-4',
+		showCollapsedDivider: index > 0
+	})
+);
 
 export const ROUTE_REGISTRY = {
-	'veolia-trade-credit': {
-		sectionId: 'next-30-days',
-		href: '/veolia-trade-credit',
-		navLabel: 'Trade credit',
-		title: 'Trade credit for Veolia',
-		icon: HandCoins
-	},
-	'cirque-cyber': {
-		sectionId: 'next-90-days',
-		href: '/cirque-cyber',
-		navLabel: 'Cyber',
-		title: 'Cyber for Cirque du Soleil',
-		icon: Shield
-	},
-	'cirque-global-services': {
-		sectionId: 'next-90-days',
-		href: '/cirque-global-services',
-		navLabel: 'Global services',
-		title: 'Global services for Cirque du Soleil',
-		icon: Globe
-	},
-	'exterra-environmental-risk': {
-		sectionId: 'history',
-		href: '/exterra-environmental-risk',
-		navLabel: 'Environmental risk',
-		title: 'Environmental risk for Exterra',
-		icon: Leaf
-	},
-	'exterra-surety': {
-		sectionId: 'history',
-		href: '/exterra-surety',
-		navLabel: 'Surety',
-		title: 'Surety for Exterra',
-		icon: BadgeDollarSign
-	}
-} as const satisfies Record<string, AppRouteDefinition>;
+	'veolia-trade-credit': createRouteDefinition('veolia-trade-credit'),
+	'cirque-cyber': createRouteDefinition('cirque-cyber'),
+	'cirque-global-services': createRouteDefinition('cirque-global-services'),
+	'exterra-environmental-risk': createRouteDefinition('exterra-environmental-risk'),
+	'exterra-surety': createRouteDefinition('exterra-surety')
+} as const satisfies Record<NavRouteId, AppRouteDefinition>;
 
-export type NavRouteId = keyof typeof ROUTE_REGISTRY;
-export type NavPath = (typeof ROUTE_REGISTRY)[NavRouteId]['href'];
-
-export const DEFAULT_ROUTE_ID: NavRouteId = 'exterra-environmental-risk';
+export const DEFAULT_ROUTE_ID: NavRouteId = DEFAULT_DEMO_ROUTE_ID;
 export const DEFAULT_ROUTE_HREF: NavPath = ROUTE_REGISTRY[DEFAULT_ROUTE_ID].href;
-
-export const ROUTE_IDS = Object.keys(ROUTE_REGISTRY) as NavRouteId[];
+export const ROUTE_IDS_IN_ORDER = ROUTE_IDS;
+export const CLIENTS_IN_ORDER = CLIENT_IDS.map((clientId) => DEMO_CLIENTS[clientId]);
