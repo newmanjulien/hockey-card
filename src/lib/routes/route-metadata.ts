@@ -1,32 +1,15 @@
-import { getDemoClient, type DemoRouteRecord } from '$lib/demo-data/dashboard';
+import { getCategory, type PolicyRecord } from '$lib/demo-data';
 
-function toTitleCase(value: string) {
-	return value.replace(/(^|[\s-])([a-z])/g, (_match, separator: string, letter: string) => {
-		return `${separator}${letter.toUpperCase()}`;
-	});
+export function getPolicyDisplayName(policy: PolicyRecord) {
+	return policy.title.trim();
 }
 
-export function getExpertFullName(route: DemoRouteRecord) {
-	return `${route.expert.firstName} ${route.expert.lastName}`;
+export function getRouteNavLabel(policy: PolicyRecord) {
+	return getPolicyDisplayName(policy);
 }
 
-export function getInsuranceDisplayName(route: DemoRouteRecord) {
-	const insuranceName = route.insurance.name.trim();
-	const insuranceLabel = route.insurance.label.trim();
+export function getRouteTitle(policy: PolicyRecord) {
+	const category = getCategory(policy.categoryId);
 
-	return insuranceLabel ? `${insuranceName} ${insuranceLabel}` : insuranceName;
-}
-
-export function getRouteNavLabel(route: DemoRouteRecord) {
-	return toTitleCase(route.insurance.name);
-}
-
-export function getRouteTitle(route: DemoRouteRecord) {
-	const client = getDemoClient(route.clientId);
-
-	return `${getRouteNavLabel(route)} for ${client.fullName}`;
-}
-
-export function getRouteSectionHeading(route: DemoRouteRecord) {
-	return getDemoClient(route.clientId).fullName;
+	return `${category.title}: ${getRouteNavLabel(policy)}`;
 }

@@ -15,6 +15,7 @@ export type NavRouteItem = {
 	kind: 'route';
 	id: NavRouteId;
 	label: string;
+	headerTitle: string;
 	title: string;
 	href: NavPath;
 	icon: NavIcon;
@@ -44,15 +45,20 @@ export const NAV_ROUTE_ITEMS: readonly NavRouteItem[] = (
 	kind: 'route' as const,
 	id,
 	label: route.navLabel,
+	headerTitle: route.headerTitle,
 	title: route.title,
 	href: route.href as NavPath,
 	icon: route.icon
 }));
 
+const NAV_ROUTE_ITEM_REGISTRY = Object.fromEntries(
+	NAV_ROUTE_ITEMS.map((item) => [item.id, item])
+) as Record<NavRouteId, NavRouteItem>;
+
 export const NAV_SECTIONS: readonly NavSection[] = [
-	...ROUTE_SECTION_DEFINITIONS.map((section) => ({
+	...ROUTE_SECTION_DEFINITIONS.map(({ routeIds, ...section }) => ({
 		...section,
-		items: NAV_ROUTE_ITEMS.filter((item) => ROUTE_REGISTRY[item.id].sectionId === section.id)
+		items: routeIds.map((routeId) => NAV_ROUTE_ITEM_REGISTRY[routeId])
 	}))
 ] as const;
 

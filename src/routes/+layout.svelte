@@ -23,7 +23,7 @@
 	provideChromeShellState(shellState);
 
 	const currentRoute = $derived(getActiveNavRoute(page.url.pathname));
-	const currentTitle = $derived(currentRoute?.title ?? BRANDING.appName);
+	const currentTitle = $derived(currentRoute?.headerTitle ?? BRANDING.appName);
 </script>
 
 <svelte:head>

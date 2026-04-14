@@ -1,36 +1,37 @@
 import {
-	BadgeDollarSign,
+	BadgeAlert,
+	CloudRainWind,
 	CircleQuestionMark,
-	Globe,
-	HandCoins,
-	Leaf,
-	Shield
+	Droplets,
+	House,
+	Megaphone,
+	Package,
+	Signature,
+	TreePine,
+	Wrench
 } from 'lucide-svelte';
 import {
-	CLIENT_IDS,
-	DEFAULT_DEMO_ROUTE_ID,
-	ROUTE_IDS,
-	DEMO_CLIENTS,
-	getDemoRoute,
-	type DemoClientId,
-	type DemoRouteIconId,
-	type DemoRouteId
-} from '$lib/demo-data/dashboard';
-import {
-	getRouteNavLabel,
-	getRouteSectionHeading,
-	getRouteTitle
-} from '$lib/routes/route-metadata';
+	CATEGORIES,
+	CATEGORY_IDS,
+	DEFAULT_POLICY_ID,
+	POLICY_IDS,
+	getPolicy,
+	type CategoryId,
+	type PolicyIconId,
+	type PolicyId
+} from '$lib/demo-data';
+import { getRouteNavLabel, getRouteTitle } from '$lib/routes/route-metadata';
 
 type NavIcon = typeof CircleQuestionMark;
 
-export type NavSectionId = DemoClientId;
-export type NavRouteId = DemoRouteId;
+export type NavSectionId = CategoryId;
+export type NavRouteId = PolicyId;
 export type NavPath = `/${NavRouteId}`;
 
 type RouteSectionDefinition = {
 	id: NavSectionId;
 	heading: string;
+	routeIds: readonly NavRouteId[];
 	desktopSectionClass?: string;
 	mobileSectionClass?: string;
 	showCollapsedDivider?: boolean;
@@ -40,59 +41,51 @@ export type AppRouteDefinition = {
 	sectionId: NavSectionId;
 	href: NavPath;
 	navLabel: string;
+	headerTitle: string;
 	title: string;
 	icon: NavIcon;
 };
 
 const ROUTE_ICON_MAP = {
-	'badge-dollar-sign': BadgeDollarSign,
-	globe: Globe,
-	'hand-coins': HandCoins,
-	leaf: Leaf,
-	shield: Shield
-} as const satisfies Record<DemoRouteIconId, NavIcon>;
+	'badge-alert': BadgeAlert,
+	'cloud-rain-wind': CloudRainWind,
+	droplets: Droplets,
+	house: House,
+	megaphone: Megaphone,
+	package: Package,
+	signature: Signature,
+	'tree-pine': TreePine,
+	wrench: Wrench
+} as const satisfies Record<PolicyIconId, NavIcon>;
 
 function createRouteDefinition(routeId: NavRouteId): AppRouteDefinition {
-	const route = getDemoRoute(routeId);
+	const route = getPolicy(routeId);
 
 	return {
-		sectionId: route.clientId,
+		sectionId: route.categoryId,
 		href: `/${routeId}`,
 		navLabel: getRouteNavLabel(route),
+		headerTitle: getRouteNavLabel(route),
 		title: getRouteTitle(route),
 		icon: ROUTE_ICON_MAP[route.iconId]
 	};
 }
 
-function getFirstRouteForClient(clientId: NavSectionId) {
-	const routeId = ROUTE_IDS.find((candidateId) => getDemoRoute(candidateId).clientId === clientId);
-
-	if (!routeId) {
-		throw new Error(`No route found for client "${clientId}"`);
-	}
-
-	return getDemoRoute(routeId);
-}
-
-export const ROUTE_SECTION_DEFINITIONS: readonly RouteSectionDefinition[] = CLIENT_IDS.map(
-	(clientId, index) => ({
-		id: clientId,
-		heading: getRouteSectionHeading(getFirstRouteForClient(clientId)),
+export const ROUTE_SECTION_DEFINITIONS: readonly RouteSectionDefinition[] = CATEGORY_IDS.map(
+	(categoryId, index) => ({
+		id: categoryId,
+		heading: CATEGORIES[categoryId].title,
+		routeIds: CATEGORIES[categoryId].policyIds,
 		desktopSectionClass: index === 0 ? 'pt-2' : 'pt-6',
 		mobileSectionClass: index === 0 ? undefined : 'pt-4',
 		showCollapsedDivider: index > 0
 	})
 );
 
-export const ROUTE_REGISTRY = {
-	'veolia-trade-credit': createRouteDefinition('veolia-trade-credit'),
-	'cirque-cyber': createRouteDefinition('cirque-cyber'),
-	'cirque-global-services': createRouteDefinition('cirque-global-services'),
-	'exterra-environmental-risk': createRouteDefinition('exterra-environmental-risk'),
-	'exterra-surety': createRouteDefinition('exterra-surety')
-} as const satisfies Record<NavRouteId, AppRouteDefinition>;
+export const ROUTE_REGISTRY = Object.fromEntries(
+	POLICY_IDS.map((routeId) => [routeId, createRouteDefinition(routeId)])
+) as Record<NavRouteId, AppRouteDefinition>;
 
-export const DEFAULT_ROUTE_ID: NavRouteId = DEFAULT_DEMO_ROUTE_ID;
+export const DEFAULT_ROUTE_ID: NavRouteId = DEFAULT_POLICY_ID;
 export const DEFAULT_ROUTE_HREF: NavPath = ROUTE_REGISTRY[DEFAULT_ROUTE_ID].href;
-export const ROUTE_IDS_IN_ORDER = ROUTE_IDS;
-export const CLIENTS_IN_ORDER = CLIENT_IDS.map((clientId) => DEMO_CLIENTS[clientId]);
+export const ROUTE_IDS_IN_ORDER = POLICY_IDS;
