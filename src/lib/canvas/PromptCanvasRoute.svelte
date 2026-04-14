@@ -22,7 +22,7 @@
 <PromptCanvas
 	heading={content.prompt.heading}
 	value={content.prompt.initialValue}
-	actions={content.prompt.actions}
+	suggestions={content.prompt.suggestions}
 	trainer={content.trainer}
 	documents={content.documents}
 	documentsNote={content.documentsNote}

@@ -1,23 +1,15 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { fade, fly } from 'svelte/transition';
 	import type {
-		PromptCanvasAction,
-		PromptCanvasActionId,
 		PromptCanvasDocument,
+		PromptCanvasSuggestions,
 		PromptCanvasTrainer
 	} from '$lib/canvas/types';
 	import PromptCanvasRail from '$lib/canvas/PromptCanvasRail.svelte';
-	import {
-		ArrowUp,
-		CircleQuestionMark,
-		MessageCircleMore,
-		Plus,
-	} from 'lucide-svelte';
+	import { ArrowUp, CircleQuestionMark, Plus } from 'lucide-svelte';
 
 	type Props = {
 		heading: string;
-		actions: readonly PromptCanvasAction[];
+		suggestions: PromptCanvasSuggestions;
 		value?: string;
 		trainer: PromptCanvasTrainer;
 		documents?: readonly PromptCanvasDocument[];
@@ -30,7 +22,7 @@
 
 	let {
 		heading,
-		actions,
+		suggestions,
 		value = $bindable(''),
 		trainer,
 		documents = [],
@@ -38,15 +30,10 @@
 		onAttach,
 		onSubmit
 	}: Props = $props();
-	let canvasElement = $state<HTMLDivElement | null>(null);
 	let textareaElement = $state<HTMLTextAreaElement | null>(null);
-	let selectedActionId = $state<PromptCanvasActionId | null>(null);
 	const MAX_TEXTAREA_LINES = 11;
 
 	const canSubmit = $derived(Boolean(onSubmit) && value.trim().length > 0);
-	const selectedAction = $derived(
-		actions.find((action) => action.id === selectedActionId) ?? null
-	);
 
 	function syncTextareaHeight() {
 		if (!textareaElement) {
@@ -84,17 +71,8 @@
 		onSubmit(nextValue);
 	}
 
-	function handleActionSelect(actionId: PromptCanvasActionId) {
-		selectedActionId = selectedActionId === actionId ? null : actionId;
-	}
-
-	function closeSuggestions() {
-		selectedActionId = null;
-	}
-
 	function applySuggestion(suggestion: string) {
 		value = suggestion;
-		closeSuggestions();
 		syncTextareaHeight();
 		textareaElement?.focus();
 		textareaElement?.setSelectionRange(suggestion.length, suggestion.length);
@@ -105,39 +83,11 @@
 		void value;
 		syncTextareaHeight();
 	});
-
-	onMount(() => {
-		function handlePointerDown(event: PointerEvent) {
-			const target = event.target;
-
-			if (!selectedActionId || !(target instanceof Node) || !canvasElement) {
-				return;
-			}
-
-			if (!canvasElement.contains(target)) {
-				closeSuggestions();
-			}
-		}
-
-		function handleKeyDown(event: KeyboardEvent) {
-			if (event.key === 'Escape') {
-				closeSuggestions();
-			}
-		}
-
-		document.addEventListener('pointerdown', handlePointerDown);
-		window.addEventListener('keydown', handleKeyDown);
-
-		return () => {
-			document.removeEventListener('pointerdown', handlePointerDown);
-			window.removeEventListener('keydown', handleKeyDown);
-		};
-	});
 </script>
 
 <div class="prompt-canvas-layout grid min-h-full grid-cols-1">
 	<section class="flex h-full min-h-full w-full items-center justify-center px-4 py-6 md:px-8 md:py-8">
-		<div bind:this={canvasElement} class="flex w-full max-w-[43rem] flex-col items-center">
+		<div class="flex w-full max-w-[43rem] flex-col items-center">
 			<h1 class="mb-10 text-center text-[1.4rem] leading-tight tracking-[-0.02em] text-zinc-900">
 				{heading}
 			</h1>
@@ -192,66 +142,25 @@
 				</div>
 			</form>
 
-			<div class="relative w-full">
-				<div
-					class={`flex flex-wrap items-center justify-center gap-2.5 transition-opacity duration-150 ${
-						selectedAction ? 'pointer-events-none opacity-0' : 'opacity-100'
-					}`}
-				>
-						{#each actions as action (action.id)}
+				<div class="relative w-full">
+					<div class="w-full overflow-hidden">
+						{#each suggestions as suggestion, index (suggestion)}
 							<button
 								type="button"
-							class="inline-flex h-9 items-center gap-1.75 rounded-full border border-zinc-100 bg-white px-3.5 text-[0.82rem] text-zinc-600 transition-colors hover:bg-zinc-50"
+								class="flex w-full items-center gap-2 rounded-xl px-3 py-2.75 text-left text-[0.8rem] font-normal text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-700 md:px-3.5 md:py-3 md:text-[0.84rem]"
 							onclick={() => {
-								handleActionSelect(action.id);
+								applySuggestion(suggestion);
 							}}
 						>
-							{#if action.id === 'image'}
-								<CircleQuestionMark class="size-3.5 text-blue-500" />
-							{:else}
-								<MessageCircleMore class="size-3.5 text-blue-500" />
-							{/if}
-
-							<span>{action.label}</span>
+							<CircleQuestionMark class="size-3.5 shrink-0 text-zinc-500" />
+							<span>{suggestion}</span>
 						</button>
-					{/each}
+
+							{#if index < suggestions.length - 1}
+								<div class="h-px w-full bg-zinc-100/50"></div>
+							{/if}
+						{/each}
 				</div>
-
-				{#if selectedAction}
-					{#key selectedAction.id}
-						<div
-							class="absolute inset-x-0 top-0 z-10"
-							in:fly={{ y: 8, duration: 180 }}
-							out:fade={{ duration: 120 }}
-						>
-							<div class="w-full overflow-hidden">
-								{#each selectedAction.suggestions as suggestion, index (suggestion)}
-									<div in:fly={{ y: 6, duration: 180, delay: 30 * index + 35 }}>
-										<button
-											type="button"
-											class="flex w-full items-center gap-2 rounded-xl px-3 py-2.75 text-left text-[0.8rem] font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-700 md:px-3.5 md:py-3 md:text-[0.84rem]"
-											onclick={() => {
-												applySuggestion(suggestion);
-											}}
-										>
-											{#if selectedAction.id === 'image'}
-												<CircleQuestionMark class="size-3.5 shrink-0 text-zinc-500" />
-											{:else}
-												<MessageCircleMore class="size-3.5 shrink-0 text-zinc-500" />
-											{/if}
-
-											<span>{suggestion}</span>
-										</button>
-									</div>
-
-									{#if index < selectedAction.suggestions.length - 1}
-										<div class="h-px w-full bg-zinc-100/50"></div>
-									{/if}
-								{/each}
-							</div>
-						</div>
-					{/key}
-				{/if}
 			</div>
 		</div>
 	</section>
@@ -268,16 +177,6 @@
 		.prompt-canvas-layout {
 			min-height: 100cqh;
 			grid-template-columns: minmax(0, 1fr) var(--prompt-canvas-rail-width);
-		}
-
-		.prompt-canvas-rail-frame {
-			height: 100%;
-		}
-
-		.prompt-canvas-rail-surface {
-			position: sticky;
-			top: 0;
-			height: 100cqh;
 		}
 	}
 </style>

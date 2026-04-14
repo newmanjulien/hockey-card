@@ -1,8 +1,8 @@
 import type {
-  PromptCanvasAction,
   PromptCanvasContent,
   PromptCanvasDocument,
   PromptCanvasRouteContent,
+  PromptCanvasSuggestions,
 } from "$lib/canvas/types";
 import {
   getCategory,
@@ -18,34 +18,18 @@ import {
 } from "$lib/routes/route-metadata";
 
 const DEFAULT_PROMPT_HEADING = "What would you like to know about this policy?";
-const DEFAULT_PROMPT_ACTIONS = [
-  {
-    id: "image",
-    label: "Understand this policy",
-    suggestions: [
-      "Explain how this policy typically works",
-      "What exposures is this policy designed to address?",
-      "Where does this policy usually respond, and where does it not?",
-      "What exclusions, limits, or conditions matter most here?",
-    ],
-  },
-  {
-    id: "edit",
-    label: "Prepare underwriting questions",
-    suggestions: [
-      "What underwriting questions should I ask first?",
-      "What submission details matter most for this policy?",
-      "What follow-up questions would clarify the exposures here?",
-      "What missing information would block a solid review?",
-    ],
-  },
-] as const satisfies readonly PromptCanvasAction[];
+const DEFAULT_PROMPT_SUGGESTIONS = [
+  "Explain how this policy typically works",
+  "What exposures is this policy designed to address?",
+  "Where does this policy usually respond, and where does it not?",
+  "What exclusions, limits, or conditions matter most here?",
+] as const satisfies PromptCanvasSuggestions;
 
 function createPromptContent(initialValue: string): PromptCanvasContent {
   return {
     heading: DEFAULT_PROMPT_HEADING,
     initialValue,
-    actions: DEFAULT_PROMPT_ACTIONS,
+    suggestions: DEFAULT_PROMPT_SUGGESTIONS,
   };
 }
 

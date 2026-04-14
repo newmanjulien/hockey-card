@@ -1,10 +1,4 @@
-export type PromptCanvasActionId = 'image' | 'edit';
-
-export type PromptCanvasAction = {
-	id: PromptCanvasActionId;
-	label: string;
-	suggestions: readonly [string, string, string, string];
-};
+export type PromptCanvasSuggestions = readonly [string, string, string, string];
 
 export type PromptCanvasTrainer = {
 	name: string;
@@ -21,7 +15,7 @@ export type PromptCanvasDocument = {
 export type PromptCanvasContent = {
 	heading: string;
 	initialValue: string;
-	actions: readonly PromptCanvasAction[];
+	suggestions: PromptCanvasSuggestions;
 };
 
 export type PromptCanvasRouteContent = {
